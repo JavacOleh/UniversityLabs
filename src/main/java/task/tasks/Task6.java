@@ -1,43 +1,50 @@
-package tasks;
+package task.tasks;
 
-import common.ConsoleUtil;
-import common.ParseService;
+import consoledInterface.ApplicationInit;
+import consoledInterface.controller.sub.input.Cin;
+import consoledInterface.util.ParseUtil;
 
 import java.text.MessageFormat;
 import java.util.*;
 
+import static consoledInterface.controller.sub.output.Cout.cout;
+import static consoledInterface.util.System.system;
+
 public class Task6 {
-    private final ParseService parseService;
-    private final ConsoleUtil consoleUtil;
+
+    private final ParseUtil parseUtil;
+    private final Cin cin;
     private List<Integer> integers;
     private int indexOfMaxElement;
     private int elementMax;
     private boolean executedVar3;
 
-    public Task6(ParseService parseService) {
-        this.parseService = parseService;
-        consoleUtil = new ConsoleUtil(parseService);
+    public Task6(ParseUtil parseUtil) {
+        this.parseUtil = parseUtil;
         integers = new ArrayList<>();
+        cin = ApplicationInit.getIO().getInputController().getCin();
     }
 
     public void execute() {
         int choice;
-        System.out.println("Welcome to task 6!");
+        cout("Welcome to task 6!", ApplicationInit.textColor);
         int exitChoice = 5;
         do {
-            System.out.print(MessageFormat.format("""
+            cout(MessageFormat.format("""
                     Please select operation:
                     1.Enter digits to array
                     2.Let program to enter 10 digits to array itself
                     3.Execute task
                     4.Show details
                     {0}.Exit from task
-                    """, exitChoice));
-            choice = parseService.getParsedInt(exitChoice, 0);
+                    """, exitChoice), ApplicationInit.textColor);
+
+            choice = parseUtil.getParsedInt(exitChoice, 0);
 
             if (choice < exitChoice) {
                 operationExecutor(choice);
-                consoleUtil.waitAndCls();
+                system("pause");
+                system("cls");
             }
 
         } while (choice < exitChoice);
@@ -47,12 +54,12 @@ public class Task6 {
         switch (choice) {
             case 1 -> {
                 String temp;
-                System.out.println("Please enter digits or enter 'exit' to exit");
+                cout("Please enter digits or enter 'exit' to exit", ApplicationInit.textColor);
                 do {
-                    temp = parseService.scanner.nextLine();
+                    temp = cin.getLine();
 
                     if (!temp.contains("exit")) {
-                        var temp2 = parseService.getParsedIntByStringValue(temp);
+                        var temp2 = parseUtil.getParsedIntByStringValue(temp);
                         integers.add(temp2);
                     }
 
@@ -73,7 +80,7 @@ public class Task6 {
 
             case 3 -> {
                 if (integers.isEmpty()) {
-                    System.out.println("Please choose operation 1 or 2 for first, and only then choose operation 3.");
+                    cout("Please choose operation 1 or 2 for first, and only then choose operation 3.", ApplicationInit.textColor);
                     return;
                 }
                 indexOfMaxElement = integers.indexOf(Collections.max(integers));
@@ -98,24 +105,24 @@ public class Task6 {
 
             case 4 -> {
                 if (integers.isEmpty()) {
-                    System.out.println("Please choose operation 1 or 2 for first, and only then choose operation 3.");
+                    cout("Please choose operation 1 or 2 for first, and only then choose operation 3.", ApplicationInit.textColor);
                     return;
                 }
-
-                System.out.print(MessageFormat.format("""
+                cout(MessageFormat.format("""
                                 The array: {0}
                                 """,
                         integers.toString()
-                        ));
+                ), ApplicationInit.textColor);
 
                 if (executedVar3) {
-                    System.out.print(MessageFormat.format("""
+                    cout(MessageFormat.format("""
                                     The max element: {0}
                                     The index of max element: {1}
                                     """,
                             elementMax,
                             indexOfMaxElement
-                    ));
+                    ), ApplicationInit.textColor);
+
                 }
 
             }

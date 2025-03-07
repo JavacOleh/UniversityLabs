@@ -1,34 +1,35 @@
-package tasks;
+package task.tasks;
 
-import common.ConsoleUtil;
+
 import common.FileService;
-import common.ParseService;
+import consoledInterface.util.ParseUtil;
+import consoledInterface.ApplicationInit;
 
 import java.nio.file.Path;
-import java.text.MessageFormat;
+
+import static consoledInterface.util.System.system;
+import static consoledInterface.controller.sub.output.Cout.cout;
 
 public class Task2 {
     private final FileService fileService;
-    private final ParseService parseService;
-    private final ConsoleUtil consoleUtil;
+    private final ParseUtil parseUtil;
 
     private int x;
     private double distanceAtoB;
     private double distanceBtoC;
     private double cargoWeight;
 
-    public Task2(ParseService parseService) {
-        this.parseService = parseService;
-        this.consoleUtil = new ConsoleUtil(parseService);
+    public Task2(ParseUtil parseUtil) {
+        this.parseUtil = parseUtil;
         fileService = new FileService(Path.of("src/data/Task2.txt"));
     }
 
     public void execute() {
         int choice;
         int exitChoice = 4;
-        System.out.println("Welcome to task 2!");
+        cout("Welcome to task 2!", ApplicationInit.textColor);
         do {
-            System.out.println("""
+            cout("""
                     Please select operation:
                     
                     1.Read such data from file:
@@ -49,14 +50,18 @@ public class Task2 {
                     ! If you choose that option without
                     entering data, calculate won't happen !
                     
-                    """ + exitChoice + ".Exit from task");
-            choice = parseService.getParsedInt(exitChoice, 1);
+                    """ + exitChoice + ".Exit from task", ApplicationInit.textColor
+            );
+
+            choice = parseUtil.getParsedInt(exitChoice, 1);
 
             operationExecutor(choice);
-            if(choice < exitChoice)
-                consoleUtil.waitAndCls();
+            if (choice < exitChoice) {
+                system("pause");
+                system("cls");
+            }
 
-        }while (choice < exitChoice);
+        } while (choice < exitChoice);
     }
 
     /*
@@ -83,17 +88,17 @@ public class Task2 {
             }
 
             case 2: {
-                System.out.println("Please enter x(current fuel):");
-                x = parseService.getParsedInt(7000,0);
+                cout("Please enter x(current fuel):", ApplicationInit.textColor);
+                x = parseUtil.getParsedInt(7000, 0);
 
-                System.out.println("Please enter distance between point A & B(in kilometers):");
-                distanceAtoB = parseService.getParsedDouble();
+                cout("Please enter distance between point A & B(in kilometers):", ApplicationInit.textColor);
+                distanceAtoB = parseUtil.getParsedDouble();
 
-                System.out.println("Please enter distance between point B & C(in kilometers):");
-                distanceBtoC = parseService.getParsedDouble();
+                cout("Please enter distance between point B & C(in kilometers):", ApplicationInit.textColor);
+                distanceBtoC = parseUtil.getParsedDouble();
 
-                System.out.println("Please enter cargo weight(in kilograms):");
-                cargoWeight = parseService.getParsedInt();
+                cout("Please enter cargo weight(in kilograms):", ApplicationInit.textColor);
+                cargoWeight = parseUtil.getParsedInt();
 
                 StringBuilder temp = new StringBuilder();
                 temp.append("x: " + x + "\n");
@@ -108,7 +113,7 @@ public class Task2 {
             case 3: {
                 int fuelConsumption = getFuelConsumption();
                 if (fuelConsumption == -1) {
-                    System.out.println("Airplane cannot fly because cargo weight is above 2000!");
+                    cout("Airplane cannot fly because cargo weight is above 2000!", ApplicationInit.textColor);
                     return;
                 }
 
@@ -116,20 +121,19 @@ public class Task2 {
                 double fuelNeededBC = distanceBtoC * fuelConsumption;
 
                 if (fuelNeededAB > x) {
-                    System.out.println("Airplane cannot get to point B.");
+                    cout("Airplane cannot get to point B.", ApplicationInit.textColor);
                     return;
                 }
 
                 if (fuelNeededBC > x) {
-                    System.out.println("Airplane cannot fly to point C event after adding more fuel.");
+                    cout("Airplane cannot fly to point C event after adding more fuel.", ApplicationInit.textColor);
                     return;
                 }
 
                 int remainingFuel = (int) (x - fuelNeededAB);
                 int refuelNeeded = (int) Math.max(0, fuelNeededBC - remainingFuel);
 
-                System.out.println("In point B you need to add " + refuelNeeded + " liters to get from point A to point C.");
-
+                cout("In point B you need to add " + refuelNeeded + " liters to get from point A to point C.", ApplicationInit.textColor);
                 break;
             }
         }

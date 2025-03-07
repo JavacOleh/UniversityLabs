@@ -1,11 +1,14 @@
-package tasks;
-import common.ParseService;
+package task.tasks;
+import consoledInterface.util.ParseUtil;
+import consoledInterface.ApplicationInit;
+
+import static consoledInterface.controller.sub.output.Cout.cout;
 
 public class Task1 {
-    private final ParseService parseService;
+    private final ParseUtil parseUtil;
 
-    public Task1(ParseService parseService) {
-        this.parseService = parseService;
+    public Task1(ParseUtil parseUtil) {
+        this.parseUtil = parseUtil;
     }
 
     /*
@@ -16,11 +19,11 @@ public class Task1 {
     */
 
     public void execute() {
-        System.out.println("Task1");
-        System.out.println("Enter start:");
-        var n1 = parseService.getParsedInt();
-        System.out.println("Enter end:");
-        var n2 = parseService.getParsedInt();
+        cout("Task1", ApplicationInit.textColor);
+        cout("Enter start:", ApplicationInit.textColor);
+        var n1 = parseUtil.getParsedInt();
+        cout("Enter end:", ApplicationInit.textColor);
+        var n2 = parseUtil.getParsedInt();
 
         printNonPairDigitsInRange(getRange(n1,n2));
     }
@@ -33,10 +36,10 @@ public class Task1 {
     }
 
     public void printNonPairDigitsInRange(int[] range) {
-        System.out.println("Non pair digits in range [" + range[0] + ", " + range[1] + "]:");
+        cout("Non pair digits in range [" + range[0] + ", " + range[1] + "]:", ApplicationInit.textColor);
         for (int i = range[0]; i < range[1]; i++) {
             if(i % 2 != 0)
-                System.out.print(i + ", ");
+                cout(i + ", ", ApplicationInit.textColor);
         }
     }
 }

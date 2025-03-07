@@ -1,23 +1,26 @@
-package tasks;
+package task.tasks;
 
-import common.ConsoleUtil;
-import common.ParseService;
+import consoledInterface.ApplicationInit;
+import consoledInterface.controller.sub.input.Cin;
+import consoledInterface.util.ParseUtil;
 
-import java.lang.reflect.Array;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-public class Task5 {
-    private final ParseService parseService;
-    private final ConsoleUtil consoleUtil;
-    private final ArrayList<Integer> integers;
+import static consoledInterface.util.System.system;
+import static consoledInterface.controller.sub.output.Cout.cout;
 
-    public Task5(ParseService parseService) {
-        this.parseService = parseService;
-        consoleUtil = new ConsoleUtil(parseService);
+public class Task5 {
+    private final ParseUtil parseUtil;
+    private final ArrayList<Integer> integers;
+    private final Cin cin;
+
+    public Task5(ParseUtil parseUtil) {
+        this.parseUtil = parseUtil;
         integers = new ArrayList<>();
+        cin = ApplicationInit.getIO().getInputController().getCin();
     }
     /*
     Маємо одновимірний масив, заповнений випадковими числами.
@@ -31,20 +34,23 @@ public class Task5 {
     public void execute() {
         int choice;
         int exitChoice = 4;
-        System.out.println("Welcome to task 5!");
+        cout("Welcome to task 5!", ApplicationInit.textColor);
         do {
-            System.out.print(MessageFormat.format("""
+            cout(MessageFormat.format("""
                     Please select operation:
                     1.Enter digits to array
                     2.Let program to enter 10 digits to array itself
                     3.Execute task
                     {0}.Exit from task
-                    """, exitChoice));
-            choice = parseService.getParsedInt(exitChoice, 0);
+                    """, exitChoice),
+                    ApplicationInit.textColor
+            );
+            choice = parseUtil.getParsedInt(exitChoice, 0);
 
             if(choice < exitChoice) {
                 operationExecutor(choice);
-                consoleUtil.waitAndCls();
+                system("pause");
+                system("cls");
             }
 
         }while (choice < exitChoice);
@@ -54,12 +60,13 @@ public class Task5 {
         switch (choice) {
             case 1 -> {
                 String temp;
-                System.out.println("Please enter digits or enter 'exit' to exit");
+                cout("Please enter digits or enter 'exit' to exit", ApplicationInit.textColor);
                 do {
-                    temp = parseService.scanner.nextLine();
+                    system("pause");
+                    temp = cin.getLine();
 
                     if(!temp.contains("exit")) {
-                        var temp2 = parseService.getParsedIntByStringValue(temp);
+                        var temp2 = parseUtil.getParsedIntByStringValue(temp);
                         integers.add(temp2);
                     }
 
@@ -75,7 +82,7 @@ public class Task5 {
             }
             case 3 -> {
                 if(integers.isEmpty()) {
-                    System.out.println("Please choose operation 1 or 2 for first, and only then choose operation 3.");
+                    cout("Please choose operation 1 or 2 for first, and only then choose operation 3.", ApplicationInit.textColor);
                     return;
                 }
                 Integer[] array1 = integers.stream().filter(s -> s % 2 == 0).toArray(Integer[]::new);
@@ -104,7 +111,7 @@ public class Task5 {
                         Arrays.toString(array4),
                         integers.toString()
                 );
-                System.out.print(temp);
+                cout(temp, ApplicationInit.textColor);
             }
         }
     }
