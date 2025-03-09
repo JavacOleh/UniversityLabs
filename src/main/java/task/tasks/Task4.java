@@ -1,7 +1,5 @@
 package task.tasks;
 
-import consoledInterface.util.ParseUtil;
-
 import java.util.regex.Pattern;
 
 /*
@@ -17,10 +15,7 @@ import java.util.regex.Pattern;
 public class Task4 extends Task3 {
     String[] words;
 
-    public Task4(ParseUtil parseUtil) {
-        super(parseUtil);
-        task = "Task4";
-        operation1 = "1.Enter text";
+    public Task4() {
         note = """
                 Note that text must follow next rules:
                 * Every words first letter must begin with uppercased english letter
@@ -46,8 +41,18 @@ public class Task4 extends Task3 {
     }
 
     @Override
-    protected void secondOperation() {
+    public void secondOperation() {
         password = "Situation:  Motivation,  Action!  Obligation.";
+    }
+
+    @Override
+    public String getTaskName() {
+        return "Task4";
+    }
+
+    @Override
+    public String getFirstOperationName() {
+        return "Enter text";
     }
 
     private boolean checkWord(String word) {
@@ -60,14 +65,6 @@ public class Task4 extends Task3 {
         boolean endsWithTion = Pattern.compile("tion$").matcher(substring2).find();
 
         boolean endsWithPunctuation = Pattern.compile("[,.!:;]$").matcher(word).find();
-
-        /*
-        System.out.println("Word: " + word);
-        System.out.println("startsWithUpperCase: " + startsWithUpperCase);
-        System.out.println("hasValidLength: " + hasValidLength);
-        System.out.println("endsWithTion: " + endsWithTion);
-        System.out.println("endsWithPunctuation: " + endsWithPunctuation);
-        */
 
         return startsWithUpperCase && hasValidLength && endsWithTion && endsWithPunctuation;
     }

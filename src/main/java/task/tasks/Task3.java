@@ -1,16 +1,12 @@
 package task.tasks;
 
 import consoledInterface.controller.sub.input.Cin;
-import consoledInterface.util.ParseUtil;
-import consoledInterface.ApplicationInit;
 import javafx.scene.paint.Color;
 import task.interfaces.Taskable;
-
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
 
 import static consoledInterface.controller.sub.output.Cout.cout;
-import static consoledInterface.util.System.system;
 
 /*
     Перевірте, чи надійно складений пароль.
@@ -20,18 +16,13 @@ import static consoledInterface.util.System.system;
 */
 
 public class Task3 implements Taskable {
-    protected final ParseUtil parseUtil;
     protected final Cin cin;
     protected String password;
-    protected String task;
-    protected String operation1;
     protected String note;
     protected String case1;
 
-    public Task3(ParseUtil parseUtil) {
+    public Task3() {
         password = "";
-        task = "Task3";
-        operation1 = "1.Create password";
         note = MessageFormat.format("""
                         Note that password must have:
                         * lowercase and uppercase english letters.
@@ -42,61 +33,34 @@ public class Task3 implements Taskable {
                 getSpecificSymbols());
         case1 = "\nPlease enter the password:\n";
 
-        this.parseUtil = parseUtil;
-        cin = ApplicationInit.getIO().getInputController().getCin();
+        cin = Taskable.super.getCin();
     }
 
-    public void mainTaskExecute() {
-        int choice;
-        int exitChoice = 4;
-        do {
-            system("cls");
-            cout(MessageFormat.format("""
-                            ---------------{1}---------------
-                            Please select operation:
-                            {2}
-                            2.Let program do first operation itself
-                            3.Execute task
-                            {0}.Exit from task
-                            """, exitChoice, task, operation1),
-                    ApplicationInit.textColor
-            );
-            choice = parseUtil.getParsedInt(exitChoice, 0);
-
-            subTasksExecute(choice);
-
-            if (choice < exitChoice) {
-                cout("\n");
-                system("pause");
-                system("cls");
-            }
-
-        } while (choice < exitChoice);
+    @Override
+    public String getTaskName() {
+        return "Task3";
     }
 
-    public void subTasksExecute(int choice) {
-        switch (choice) {
-            case 1 -> firstOperation();
-            case 2 -> secondOperation();
-            case 3 -> thirdOperation();
-        }
+    @Override
+    public String getFirstOperationName() {
+        return "Create password";
     }
 
     private String getSpecificSymbols() {
         return "@$#^&\'\"\\?";
     }
 
-    protected void secondOperation() {
+    public void secondOperation() {
         this.password = "Password1!#@!";
     }
 
-    protected void firstOperation() {
+    public void firstOperation() {
         cout(case1);
         cout(note, Color.RED);
         password = cin.getLine();
     }
 
-    protected void thirdOperation() {
+    public void thirdOperation() {
         if (password.isEmpty()) {
             cout(emptySituation);
             return;

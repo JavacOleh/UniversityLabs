@@ -1,13 +1,12 @@
 package task.tasks;
 
-import consoledInterface.util.ConcurrentUtil;
+import consoledInterface.controller.sub.input.Cin;
 import consoledInterface.util.ParseUtil;
-import javafx.application.Platform;
 import javafx.scene.paint.Color;
+import task.interfaces.Taskable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import static consoledInterface.controller.sub.output.Cout.cout;
 
@@ -17,58 +16,38 @@ import static consoledInterface.controller.sub.output.Cout.cout;
       видаляє усі адреси з доменом .ru
 */
 
-public class Task5 extends Task3 {
-    public String exitWord;
+public class Task5 implements Taskable {
+    private Cin cin;
+    private String exitWord;
     List<String> emails;
 
-    public Task5(ParseUtil parseUtil) {
-        super(parseUtil);
+    public Task5() {
+        super();
         exitWord = "exit";
-        note = "you can enter " + exitWord + " to stop writing emails\n";
-        task = "Task5";
-        operation1 = "1.Enter emails";
-        case1 = "\nPlease enter emails:\n";
         emails  = new ArrayList<>();
+        cin = Taskable.super.getCin();
     }
 
     @Override
-    protected void firstOperation() {
-        cout("\nSorry this operation is temporarily unavailable, " +
-                "we're working on it.\nPlease keep checking our github for updates.\nThanks for your understanding.",
-                Color.DARKRED
-        );
-
-        /*Bug with multithreading:
-         (1-2 times works looks like okay but more times - stuns and doesn't keep to next code),
-          some why doesn't read 'exit' when user entered to exit.
-         */
-
-        /*
-        CountDownLatch latch = new CountDownLatch(1);
+    public void firstOperation() {
         String temp;
-        cout(case1);
-        cout(note, Color.GREEN);
+        cout("\nPlease enter emails:\n");
+        cout("you can enter " + exitWord + " to stop writing emails\n", Color.GREEN);
 
         do {
-            temp = cin.getLine();
+            cin.setCinActive(true); //Флажок устанавливаться в методе cin.getLine() успевает не всегда почему-то. Поэтому будем его тут устанавливать
 
+            temp = cin.getLine();
             cout("\n");
 
-            if (temp.trim().equalsIgnoreCase(exitWord)) {
-                latch.countDown();
-                break;
-            } else
+            if(!temp.equalsIgnoreCase(exitWord))
                 emails.add(temp);
 
-
-        } while (temp.trim().equalsIgnoreCase(exitWord));
-
-        ConcurrentUtil.await(latch);
-        */
+        }while (!temp.equalsIgnoreCase(exitWord));
     }
 
     @Override
-    protected void secondOperation() {
+    public void secondOperation() {
         emails.add("RussianEmail@mail.ru");
         emails.add("SecondRussianEmail@mail.ru");
         emails.add("TempEmail@gmail.com");
@@ -76,7 +55,7 @@ public class Task5 extends Task3 {
     }
 
     @Override
-    protected void thirdOperation() {
+    public void thirdOperation() {
         if(emails.isEmpty()) {
             cout(emptySituation);
             return;
@@ -90,5 +69,15 @@ public class Task5 extends Task3 {
         cout("\nGood emails:\n");
 
         emails.forEach(email -> cout(email + "\n", Color.GREEN));
+    }
+
+    @Override
+    public String getFirstOperationName() {
+        return "Add emails";
+    }
+
+    @Override
+    public String getTaskName() {
+        return "Task5";
     }
 }

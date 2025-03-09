@@ -65,11 +65,11 @@ public class TaskExectuor {
         system("cls");
 
         Taskable task = switch (choice) {
-            case 1 -> new Task1(parseUtil);
-            case 2 -> new Task2(parseUtil);
-            case 3 -> new Task3(parseUtil);
-            case 4 -> new Task4(parseUtil);
-            case 5 -> new Task5(parseUtil);
+            case 1 -> new Task1();
+            case 2 -> new Task2();
+            case 3 -> new Task3();
+            case 4 -> new Task4();
+            case 5 -> new Task5();
             default -> null;
         };
 
