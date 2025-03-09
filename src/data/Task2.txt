@@ -1,4 +1,0 @@
-x: 5
-distanceAtoB: 70.0
-distanceBtoC: 50.0
-cargoWeight: 400.0
