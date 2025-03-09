@@ -1,125 +1,127 @@
 package task.tasks;
 
+import consoledInterface.controller.sub.input.Cin;
 import consoledInterface.util.ParseUtil;
 import consoledInterface.ApplicationInit;
+import javafx.scene.paint.Color;
+import task.interfaces.Taskable;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.regex.Pattern;
 
 import static consoledInterface.controller.sub.output.Cout.cout;
 import static consoledInterface.util.System.system;
 
-public class Task3 {
-    /*
-    У кофетерій прийшли кілька друзів.
-     Реалізувати програму розрахунку вартості замовлення в кафетерії, за умови,
-      що замовлення може бути від кількох людей і кожен клієнт формує свою частину замовлення.
-       Необхідно запитати у користувача на скільки людина замовлення.
-        Далі кожній людині виводитися меню (назви напоїв, кондитерських виробів і їх ціна) і він обирає.
-         Передбачити можливість вибору декількох складників меню для клієнта, якщо він бажає додати ще щось до свого замовлення.
-Результат роботи програми – підрахунок з суми загального замовлення всієї компанії.
- Створити алгоритм таким чином, щоб була можливість обслуговувати багато компаній.
-    */
-    private final ParseUtil parseUtil;
-    private double sum = 0;
-    private final String currency = " kč";
+/*
+    Перевірте, чи надійно складений пароль.
+     Пароль вважається надійним, якщо він складається з 8 або більше символів.
+      Для створення паролю використовувати великі та малі англійські літери, цифри та символи !*_.
+     Пароль має містити хоча б одному символу з перелічених допустимих типів символів.
+*/
+
+public class Task3 implements Taskable {
+    protected final ParseUtil parseUtil;
+    protected final Cin cin;
+    protected String password;
+    protected String task;
+    protected String operation1;
+    protected String note;
+    protected String case1;
 
     public Task3(ParseUtil parseUtil) {
+        password = "";
+        task = "Task3";
+        operation1 = "1.Create password";
+        note = MessageFormat.format("""
+                        Note that password must have:
+                        * lowercase and uppercase english letters.
+                        * Length of password 8 or more.
+                        * contained numbers and symbols.
+                        * at least 1 specific symbol like {0}
+                        """,
+                getSpecificSymbols());
+        case1 = "\nPlease enter the password:\n";
+
         this.parseUtil = parseUtil;
+        cin = ApplicationInit.getIO().getInputController().getCin();
     }
 
-    public void execute() {
+    public void mainTaskExecute() {
         int choice;
-        int exitChoice = 2;
-        cout("Welcome to task 3!", ApplicationInit.textColor);
+        int exitChoice = 4;
         do {
+            system("cls");
             cout(MessageFormat.format("""
-                    Please select operation:
-                    1.Execute task
-                    {0}.Exit from task
-                    """, exitChoice),
+                            ---------------{1}---------------
+                            Please select operation:
+                            {2}
+                            2.Let program do first operation itself
+                            3.Execute task
+                            {0}.Exit from task
+                            """, exitChoice, task, operation1),
                     ApplicationInit.textColor
             );
             choice = parseUtil.getParsedInt(exitChoice, 0);
 
-            operationExecutor(choice);
+            subTasksExecute(choice);
 
-        }while (choice < exitChoice);
+            if (choice < exitChoice) {
+                cout("\n");
+                system("pause");
+                system("cls");
+            }
+
+        } while (choice < exitChoice);
     }
 
-    private void operationExecutor(int choice) {
+    public void subTasksExecute(int choice) {
         switch (choice) {
-            case 1 -> {
-                int peopleSize;
-
-                cout("""
-                        Hello Waiter!
-                        please enter how many people will make order:
-                        """,
-                        ApplicationInit.textColor
-                );
-                peopleSize = parseUtil.getParsedInt(Integer.MAX_VALUE - 1, 1);
-                taskExecute(peopleSize);
-            }
+            case 1 -> firstOperation();
+            case 2 -> secondOperation();
+            case 3 -> thirdOperation();
         }
     }
 
-    private void taskExecute(int peopleSize) {
-        int person = 0;
-        LinkedHashMap<String, Double> food = getFoodContainer();
-        int choice;
-
-        do {
-            cout(MessageFormat.format("""
-                    Please select food for {0} person(enter a digit please):
-                    """, person), ApplicationInit.textColor);
-
-            var keySet = new ArrayList<String>(food.keySet());
-            var values = new ArrayList<Double>(food.values());
-            for (int i = 0; i < food.size(); i++) {
-                cout(i + 1 + ": " + keySet.get(i) + " - " + values.get(i) + currency, ApplicationInit.textColor);
-            }
-
-            cout(food.size() + 1 + ": End order for person number " + (person + 1), ApplicationInit.textColor);
-
-            choice = parseUtil.getParsedInt(food.size() + 1, 1);
-
-            var priceList = new ArrayList<Double>(food.values());
-
-            if(choice < food.size() + 1) {
-                sum += priceList.get(choice - 1);
-                cout("Successfully added food for " + (person + 1), ApplicationInit.textColor);
-            }else {
-                person++;
-                cout("continuing with next person " + (person + 1), ApplicationInit.textColor);
-            }
-
-            system("pause");
-            system("cls");
-
-        }while (person < peopleSize);
-
-        cout("The sum of this company is: " + sum + currency, ApplicationInit.textColor);
+    private String getSpecificSymbols() {
+        return "@$#^&\'\"\\?";
     }
 
-    private LinkedHashMap<String, Double> getFoodContainer() {
-        var food = new LinkedHashMap<String, Double>();
+    protected void secondOperation() {
+        this.password = "Password1!#@!";
+    }
 
-        food.put("Durum kebab", 140.0);
-        food.put("Grander Texas Box", 241.0);
-        food.put("Single BigTasty Bacon Menu", 185.0);
-        food.put("Sushi Philadelfia(16 pieces)", 230.0);
-        food.put("Star pizza(32cm)", 175.0);
-        food.put("Star pizza(45cm)", 240.0);
-        food.put("Chips Lay's with crab flavor 133g", 100.0);
-        food.put("Crackers Flint with kebab flavor 100g", 100.0);
-        food.put("Crackers Flint with kebab crab 100g", 100.0);
-        food.put("Milka with a large hazelnut 87g", 60.0);
+    protected void firstOperation() {
+        cout(case1);
+        cout(note, Color.RED);
+        password = cin.getLine();
+    }
 
-        food.put("Coca Cola 0.5l", 50.0);
-        food.put("Sprite 0.5l", 50.0);
-        food.put("Blue Fanta 0.5l", 50.0);
-        return food;
+    protected void thirdOperation() {
+        if (password.isEmpty()) {
+            cout(emptySituation);
+            return;
+        }
+
+        cout("\nYou or program entered:\n" + password + "\n");
+
+        if (check())
+            cout("\nIt's ok\n", Color.GREEN);
+        else
+            cout("\nIt's bad\n", Color.RED);
+    }
+
+    protected boolean check() {
+        boolean hasLowercase = Pattern.compile("[a-z]").matcher(password).find();
+        boolean hasUppercase = Pattern.compile("[A-Z]").matcher(password).find();
+        boolean hasNumber = Pattern.compile("[0-9]").matcher(password).find();
+        boolean hasSpecialChar = Pattern.compile("[!*_.]").matcher(password).find();
+        boolean hasCustomChar = Pattern.compile("[" + getSpecificSymbols() + "]").matcher(password).find();
+
+        return hasLowercase &&
+                hasUppercase &&
+                hasNumber &&
+                hasSpecialChar &&
+                hasCustomChar &&
+                password.length() >= 8;
     }
 }

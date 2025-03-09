@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class ApplicationInit extends Application {
     public static final Color textColor = Color.BLACK;
     public static final String mainView = "console-view.fxml";
-    public static final String consoleTitle = "ConsoleApp";
+    public static final String consoleTitle = "Lab2";
     private static final IOcontroller ioController = new IOcontroller();
     private static Stage theStage;
 

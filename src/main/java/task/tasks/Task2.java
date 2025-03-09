@@ -1,62 +1,49 @@
 package task.tasks;
 
-
-import common.FileService;
+import consoledInterface.controller.sub.input.Cin;
 import consoledInterface.util.ParseUtil;
 import consoledInterface.ApplicationInit;
+import javafx.scene.paint.Color;
+import task.interfaces.Taskable;
 
-import java.nio.file.Path;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Random;
 
 import static consoledInterface.util.System.system;
 import static consoledInterface.controller.sub.output.Cout.cout;
 
-public class Task2 {
-    private final FileService fileService;
+public class Task2 implements Taskable {
     private final ParseUtil parseUtil;
-
-    private int x;
-    private double distanceAtoB;
-    private double distanceBtoC;
-    private double cargoWeight;
+    private final Cin cin;
+    private String someText;
 
     public Task2(ParseUtil parseUtil) {
         this.parseUtil = parseUtil;
-        fileService = new FileService(Path.of("src/data/Task2.txt"));
+        cin = ApplicationInit.getIO().getInputController().getCin();
+        someText = "";
     }
 
-    public void execute() {
-        int choice;
+    public void mainTaskExecute() {
         int exitChoice = 4;
-        cout("Welcome to task 2!", ApplicationInit.textColor);
-        do {
-            cout("""
-                    Please select operation:
-                    
-                    1.Read such data from file:
-                    * 'x' value,
-                    * distance between point A & B,
-                    * distance between point B & C,
-                    * cargo weight.
-                    
-                    2.Write such data to file:
-                    * 'x' value of oil,
-                    * distance between point A & B,
-                    * distance between point B & C,
-                    * cargo weight.
-                    ! You will enter that data in console !
-                    
-                    3.Calculate minimum fuel receivement at point B
-                     to get to point C from point A.
-                    ! If you choose that option without
-                    entering data, calculate won't happen !
-                    
-                    """ + exitChoice + ".Exit from task", ApplicationInit.textColor
-            );
+        int choice;
 
+        do {
+            system("cls");
+            cout(MessageFormat.format("""
+                    ---------------Task2---------------
+                    Please select operation:
+                    1.Enter some text
+                    2.Let program choose text
+                    3.Execute task
+                    {0}.Exit from task
+                    """, exitChoice));
             choice = parseUtil.getParsedInt(exitChoice, 1);
 
-            operationExecutor(choice);
+            subTasksExecute(choice);
+
             if (choice < exitChoice) {
+                cout("\n");
                 system("pause");
                 system("cls");
             }
@@ -65,85 +52,79 @@ public class Task2 {
     }
 
     /*
-  Вантажний літак повинен пролетіти з вантажем з пункту А пункт С через пункт В. Ємність бака для палива у літака — Х літрів (значення зчитується з файлу).
-  Споживання палива на 1 км залежно від ваги вантажу літака таке:
-- до 500 кг - 1 літрів/км;
-- до 1000 кг - 4 літрів/км;
-- до 1500 кг - 7 літрів/км;
-- до 2000 кг - 9 літрів/км;
-- більше 2000 кг – літак не піднімає.
-  З файлу вводиться відстань між пунктами А і В і відстань між пунктами В і С, а також вага вантажу.
-  Програма повинна розрахувати, яку мінімальну кількість палива необхідно для дозаправки літака в пункті В, щоб долетіти з пункту А до пункту С.
-  У разі неможливості подолати будь-яку з відстаней — програма повинна вивести повідомлення про неможливість польоту за введеним маршрутом.
+  Для деякого об’єкту StringBuilder виконайте таке:
+    • отримайте підрядки з основного рядка з використанням getChars() або subString();
+    • додайте підрядки з можливістю додавання підрядка як у кінець так і у середину існуючого рядка( append(), insert());
+    • видаліть або замініть деякий підрядок з основного рядка (delete(), insert()).
      */
 
-    private void operationExecutor(int choice) {
+    public void subTasksExecute(int choice) {
         switch (choice) {
-            case 1: {
-                x = Integer.parseInt(fileService.getPropertyFromFile("x"));
-                distanceAtoB = Double.parseDouble(fileService.getPropertyFromFile("distanceAtoB"));
-                distanceBtoC = Double.parseDouble(fileService.getPropertyFromFile("distanceBtoC"));
-                cargoWeight = Double.parseDouble(fileService.getPropertyFromFile("cargoWeight"));
-                break;
+            case 1 -> {
+                cout("\nEnter text please:\n");
+                someText = cin.getLine();
             }
 
-            case 2: {
-                cout("Please enter x(current fuel):", ApplicationInit.textColor);
-                x = parseUtil.getParsedInt(7000, 0);
+            case 2 -> someText =
+                    "Example text, this is just example." +
+                            "Not more than example and you should know this.\n" +
+                            "And yeah, this is still text. Don't forget that!";
 
-                cout("Please enter distance between point A & B(in kilometers):", ApplicationInit.textColor);
-                distanceAtoB = parseUtil.getParsedDouble();
-
-                cout("Please enter distance between point B & C(in kilometers):", ApplicationInit.textColor);
-                distanceBtoC = parseUtil.getParsedDouble();
-
-                cout("Please enter cargo weight(in kilograms):", ApplicationInit.textColor);
-                cargoWeight = parseUtil.getParsedInt();
-
-                StringBuilder temp = new StringBuilder();
-                temp.append("x: " + x + "\n");
-                temp.append("distanceAtoB: " + distanceAtoB + "\n");
-                temp.append("distanceBtoC: " + distanceBtoC + "\n");
-                temp.append("cargoWeight: " + cargoWeight + "\n");
-
-                fileService.writeDataToFilePath(temp.toString());
-                break;
-            }
-
-            case 3: {
-                int fuelConsumption = getFuelConsumption();
-                if (fuelConsumption == -1) {
-                    cout("Airplane cannot fly because cargo weight is above 2000!", ApplicationInit.textColor);
+            case 3 -> {
+                if (someText.isEmpty()) {
+                    cout(emptySituation);
                     return;
                 }
 
-                double fuelNeededAB = distanceAtoB * fuelConsumption;
-                double fuelNeededBC = distanceBtoC * fuelConsumption;
+                String splitter = "\n";
+                //Для удобства заменим все разделители на splitter
+                someText = someText.replaceAll("[.,!?]", splitter);
 
-                if (fuelNeededAB > x) {
-                    cout("Airplane cannot get to point B.", ApplicationInit.textColor);
-                    return;
+                //Sub strings via subString()
+                var stringBuilder = new StringBuilder(someText);
+                ArrayList<String> subStrings = new ArrayList<>();
+                int end = stringBuilder.lastIndexOf(splitter);
+                int start;
+
+                while (end != -1) {
+                    start = stringBuilder.lastIndexOf(splitter, end - 1); // Найдем начало подстроки перед разделителем
+                    if (start == -1) {
+                        subStrings.add(stringBuilder.substring(0, end));
+                    } else {
+                        subStrings.add(stringBuilder.substring(start + 1, end)); // +1, чтобы не включить сам разделитель
+                    }
+                    end = start;
                 }
 
-                if (fuelNeededBC > x) {
-                    cout("Airplane cannot fly to point C event after adding more fuel.", ApplicationInit.textColor);
-                    return;
+                //Adding subStrings
+                stringBuilder = new StringBuilder("");
+                var rnd = new Random();
+                int randomInt;
+
+                for (int i = 0; i < subStrings.size(); i++) {
+                    var temp = subStrings.get(i);
+                    if (i < subStrings.size() / 2)
+                        stringBuilder.append(temp).append(splitter);
+                    else {
+                        randomInt = rnd.nextInt(0, subStrings.size() / 2);
+                        stringBuilder.insert(randomInt, temp + splitter);
+                    }
                 }
 
-                int remainingFuel = (int) (x - fuelNeededAB);
-                int refuelNeeded = (int) Math.max(0, fuelNeededBC - remainingFuel);
+                cout("\nПідрядки з основного рядка з використанням subString():\n");
+                cout(subStrings.toString(), Color.RED);
 
-                cout("In point B you need to add " + refuelNeeded + " liters to get from point A to point C.", ApplicationInit.textColor);
-                break;
+                cout("\nДодані підрядки як у кінець так і у середину існуючого рядка:\n");
+                cout(stringBuilder.toString(), Color.BLUE);
+
+                //Replacing some subString
+                int replaceStart = stringBuilder.lastIndexOf(someText.substring(someText.lastIndexOf(splitter)));
+
+                stringBuilder.replace(replaceStart, stringBuilder.length(), " Something ");
+
+                cout("\nЗамінений деякий підрядок з основного рядка:\n");
+                cout(stringBuilder.toString(), Color.BLUE);
             }
         }
-    }
-
-    private int getFuelConsumption() {
-        if (cargoWeight > 2000) return -1; // Літак не може підняти вантаж
-        if (cargoWeight > 1500) return 9;
-        if (cargoWeight > 1000) return 7;
-        if (cargoWeight > 500) return 4;
-        return 1;
     }
 }

@@ -1,45 +1,134 @@
 package task.tasks;
-import consoledInterface.util.ParseUtil;
+
 import consoledInterface.ApplicationInit;
+import consoledInterface.controller.sub.input.Cin;
+import consoledInterface.util.ParseUtil;
+import javafx.scene.paint.Color;
+import task.interfaces.Taskable;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static consoledInterface.controller.sub.output.Cout.cout;
+import static consoledInterface.util.System.system;
 
-public class Task1 {
+public class Task1 implements Taskable {
     private final ParseUtil parseUtil;
+    private final Cin cin;
+    private String someText;
 
     public Task1(ParseUtil parseUtil) {
         this.parseUtil = parseUtil;
+        cin = ApplicationInit.getIO().getInputController().getCin();
+        someText = "";
     }
 
     /*
-Користувач вводить з клавіатури два числа.
- Потрібно вивести всі непарні числа у вказаному діапазоні.
- Якщо межі вказані не вірно потрібно провести нормалізацію границь.
- Наприклад, якщо ввели 20 і 11, потрібна нормалізація, після якої початок стане рівним 11, а кінець 20
+    З заданим текстом необхідно виконати наступне:
+    • підрахувати кількість, слів та речень у рядку;
+    • продублювати найдовший рядок у тексті;
+    • існує масив заборонених слів. Необхідно замінити символи заборонених слів зірочками.
     */
 
-    public void execute() {
-        cout("Task1", ApplicationInit.textColor);
-        cout("Enter start:", ApplicationInit.textColor);
-        var n1 = parseUtil.getParsedInt();
-        cout("Enter end:", ApplicationInit.textColor);
-        var n2 = parseUtil.getParsedInt();
+    @Override
+    public void mainTaskExecute() {
+        int exitChoice = 4;
+        int choice;
+        do {
+            system("cls");
+            cout(MessageFormat.format("""
+                    ---------------Task1---------------
+                    Please select operation:
+                    1.Enter some text
+                    2.Let program choose text
+                    3.Execute task
+                    {0}.Exit from task
+                    """, exitChoice));
+            choice = parseUtil.getParsedInt(exitChoice, 1);
 
-        printNonPairDigitsInRange(getRange(n1,n2));
+            subTasksExecute(choice);
+
+            if (choice < exitChoice) {
+                cout("\n");
+                system("pause");
+                system("cls");
+            }
+
+        } while (choice < exitChoice);
     }
 
-    public int[] getRange(int a1, int a2) {
-        //a1 = a1 < 0 ? a1 * -1 : a1;
-        //a2 = a2 < 0 ? a2 * -1 : a2;
-        a2 = a1 == a2 ? a2 += 10 : a2;
-        return a2 > a1 ? new int[] { a1, a2 } : new int[] { a2, a1 };
-    }
+    public void subTasksExecute(int choice) {
+        switch (choice) {
+            case 1 -> {
+                cout("\nEnter text please:\n");
+                someText = cin.getLine();
+            }
 
-    public void printNonPairDigitsInRange(int[] range) {
-        cout("Non pair digits in range [" + range[0] + ", " + range[1] + "]:", ApplicationInit.textColor);
-        for (int i = range[0]; i < range[1]; i++) {
-            if(i % 2 != 0)
-                cout(i + ", ", ApplicationInit.textColor);
+            case 2 -> someText =
+                    "Example text, this is just example." +
+                    "Not more than example and you should know this.\n" +
+                    "And yeah, this is still text. Don't forget that!";
+
+            case 3 -> {
+                if (someText.isEmpty()) {
+                    cout(emptySituation);
+                    return;
+                }
+
+                int wordsCountInLine = someText.split("\\s+").length;
+                int sentencesCountInEachLine = someText.split("[.!?]").length;
+                StringBuffer theBiggestSentence = new StringBuffer();
+                AtomicReference<String> filteredText = new AtomicReference<>(someText);
+
+                //TheBiggestLine
+                theBiggestSentence.append(
+                        Stream.of(someText.split("[.!?]"))
+                                .max(Comparator.comparingInt(String::length))
+                                .orElse("")
+                );
+
+                //Filtered text
+                var badWords = getBadWords();
+                badWords.forEach(badWord ->
+                        filteredText.set(
+                                filteredText.get().replaceAll(
+                                        "(?i)" + badWord,
+                                        "*".repeat(badWord.length())
+                                )
+                        )
+                );
+                cout(MessageFormat.format("""
+                                
+                                
+                                Count of words in text: {0}
+                                Count of sentences in text: {1}""",
+                        wordsCountInLine,
+                        sentencesCountInEachLine
+                ));
+                cout("\nThe biggest sentence in text:\n");
+                cout(theBiggestSentence.toString(), Color.RED);
+                cout("\nText without bad words(filtered text):\n");
+                cout(filteredText.get(), Color.GREEN);
+            }
         }
+    }
+
+    public ArrayList<String> getBadWords() {
+        var temp = new ArrayList<String>();
+
+        //EN
+        temp.add("Dumb");
+        temp.add("Idiot");
+        temp.add("Dickhead");
+        temp.add("Bitch");
+        temp.add("Stupid");
+        temp.add("Fuck");
+        temp.add("Fagot");
+
+        //Русские слова добавлять не буду, не хочу)
+        return temp;
     }
 }

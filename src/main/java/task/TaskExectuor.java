@@ -4,9 +4,9 @@ import consoledInterface.util.ParseUtil;
 import consoledInterface.ApplicationInit;
 import consoledInterface.util.ConcurrentUtil;
 import lombok.Getter;
+import task.interfaces.Taskable;
 import task.tasks.*;
 
-import java.text.MessageFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,22 +24,21 @@ public class TaskExectuor {
         parseUtil = new ParseUtil(ApplicationInit.getIO().getInputController().getCin());
     }
 
-    public void main() {
+    public void start() {
         executorService.submit(() -> {
             AtomicInteger choice = new AtomicInteger(-1);
-            int exitChoice = 7;
-            cout("Welcome to my application!", ApplicationInit.textColor);
+            int exitChoice = 6;
+            cout("Welcome to my application!\n", ApplicationInit.textColor);
             do {
                 cout("""
-                ------------Main menu------------
-                please select operation:
-                1.Task 1
-                2.Task 2
-                3.Task 3
-                4.Task 4
-                5.Task 5
-                6.Task 6
-                """, ApplicationInit.textColor);
+                        ------------Main menu------------
+                        please select operation:
+                        1.Task 1
+                        2.Task 2
+                        3.Task 3
+                        4.Task 4
+                        5.Task 5
+                        """, ApplicationInit.textColor);
 
                 choice.set(parseUtil.getParsedInt(exitChoice, 1));
 
@@ -50,10 +49,10 @@ public class TaskExectuor {
                 if (choice.get() < exitChoice) {
                     system("pause");
                     system("cls");
-                }else {
+                } else {
                     cout("Thanks for using my application!" +
                             "\nYou can close the program if you want." +
-                            "\nTask has ended, there won't be anything now." +
+                            "\nTasks has ended, there won't be anything now." +
                             "\nRestart the app to restart task."
                     );
                 }
@@ -64,42 +63,21 @@ public class TaskExectuor {
 
     public void executor(int choice) {
         system("cls");
-        switch (choice) {
-            case 1: {
-                Task1 task1 = new Task1(parseUtil);
-                task1.execute();
-                break;
-            }
 
-            case 2: {
-                Task2 task2 = new Task2(parseUtil);
-                task2.execute();
-                break;
-            }
+        Taskable task = switch (choice) {
+            case 1 -> new Task1(parseUtil);
+            case 2 -> new Task2(parseUtil);
+            case 3 -> new Task3(parseUtil);
+            case 4 -> new Task4(parseUtil);
+            case 5 -> new Task5(parseUtil);
+            default -> null;
+        };
 
-            case 3: {
-                Task3 task3 = new Task3(parseUtil);
-                task3.execute();
-                break;
-            }
+        if (task != null)
+            task.mainTaskExecute();
+        else
+            cout("Unknown Task!");
 
-            case 4: {
-                Task4 task4 = new Task4(parseUtil);
-                task4.execute();
-                break;
-            }
-
-            case 5: {
-                Task5 task5 = new Task5(parseUtil);
-                task5.execute();
-                break;
-            }
-            case 6: {
-                Task6 task6 = new Task6(parseUtil);
-                task6.execute();
-                break;
-            }
-        }
         system("cls");
     }
 }

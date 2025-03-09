@@ -1,140 +1,94 @@
 package task.tasks;
 
-import consoledInterface.ApplicationInit;
-import consoledInterface.controller.sub.input.Cin;
+import consoledInterface.util.ConcurrentUtil;
 import consoledInterface.util.ParseUtil;
+import javafx.application.Platform;
+import javafx.scene.paint.Color;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
-import static consoledInterface.util.System.system;
 import static consoledInterface.controller.sub.output.Cout.cout;
 
-public class Task5 {
-    private final ParseUtil parseUtil;
-    private final ArrayList<Integer> integers;
-    private final Cin cin;
+/*
+    Напишіть метод,
+     який з деякого рядка, що містить певну сукупність електронних адрес
+      видаляє усі адреси з доменом .ru
+*/
+
+public class Task5 extends Task3 {
+    public String exitWord;
+    List<String> emails;
 
     public Task5(ParseUtil parseUtil) {
-        this.parseUtil = parseUtil;
-        integers = new ArrayList<>();
-        cin = ApplicationInit.getIO().getInputController().getCin();
+        super(parseUtil);
+        exitWord = "exit";
+        note = "you can enter " + exitWord + " to stop writing emails\n";
+        task = "Task5";
+        operation1 = "1.Enter emails";
+        case1 = "\nPlease enter emails:\n";
+        emails  = new ArrayList<>();
     }
-    /*
-    Маємо одновимірний масив, заповнений випадковими числами.
-    На основі даних масиву потрібно створити двовимірний масив з наступних рядків:
-    1 одновимірний масив, що містить лише парні числа;
-    2 одновимірний масив, що містить лише ті числа масиву, що є числами Фібоначі;
-    3 одновимірний масив, що містить лише від’ємні числа масиву, що більші за число -17;
-    4 одновимірний масив, що містить прості числа з першого масиву
-     */
 
-    public void execute() {
-        int choice;
-        int exitChoice = 4;
-        cout("Welcome to task 5!", ApplicationInit.textColor);
+    @Override
+    protected void firstOperation() {
+        cout("\nSorry this operation is temporarily unavailable, " +
+                "we're working on it.\nPlease keep checking our github for updates.\nThanks for your understanding.",
+                Color.DARKRED
+        );
+
+        /*Bug with multithreading:
+         (1-2 times works looks like okay but more times - stuns and doesn't keep to next code),
+          some why doesn't read 'exit' when user entered to exit.
+         */
+
+        /*
+        CountDownLatch latch = new CountDownLatch(1);
+        String temp;
+        cout(case1);
+        cout(note, Color.GREEN);
+
         do {
-            cout(MessageFormat.format("""
-                    Please select operation:
-                    1.Enter digits to array
-                    2.Let program to enter 10 digits to array itself
-                    3.Execute task
-                    {0}.Exit from task
-                    """, exitChoice),
-                    ApplicationInit.textColor
-            );
-            choice = parseUtil.getParsedInt(exitChoice, 0);
+            temp = cin.getLine();
 
-            if(choice < exitChoice) {
-                operationExecutor(choice);
-                system("pause");
-                system("cls");
-            }
+            cout("\n");
 
-        }while (choice < exitChoice);
+            if (temp.trim().equalsIgnoreCase(exitWord)) {
+                latch.countDown();
+                break;
+            } else
+                emails.add(temp);
+
+
+        } while (temp.trim().equalsIgnoreCase(exitWord));
+
+        ConcurrentUtil.await(latch);
+        */
     }
 
-    public void operationExecutor(int choice) {
-        switch (choice) {
-            case 1 -> {
-                String temp;
-                cout("Please enter digits or enter 'exit' to exit", ApplicationInit.textColor);
-                do {
-                    system("pause");
-                    temp = cin.getLine();
-
-                    if(!temp.contains("exit")) {
-                        var temp2 = parseUtil.getParsedIntByStringValue(temp);
-                        integers.add(temp2);
-                    }
-
-                }while (!temp.contains("exit"));
-            }
-            case 2 -> {
-                Random random = new Random();
-
-                for (int i = 0; i < 10; i++) {
-                    var tempValue = random.nextInt(-100, 100);
-                    integers.add(tempValue);
-                }
-            }
-            case 3 -> {
-                if(integers.isEmpty()) {
-                    cout("Please choose operation 1 or 2 for first, and only then choose operation 3.", ApplicationInit.textColor);
-                    return;
-                }
-                Integer[] array1 = integers.stream().filter(s -> s % 2 == 0).toArray(Integer[]::new);
-                Integer[] array2 = getFibonacciArray();
-                Integer[] array3 = integers.stream().filter(s -> s < 0 && s > -17).toArray(Integer[]::new);
-                Integer[] array4 = integers.stream().filter(this::isPrime).toArray(Integer[]::new);
-                var temp = MessageFormat.format("""
-                        1.Одновимірний масив, що містить лише парні числа:
-                        {0}
-                        
-                        2.Одновимірний масив, що містить лише ті числа масиву, що є числами Фібоначі:
-                        {1}
-                        
-                        3.Одновимірний масив, що містить лише від’ємні числа масиву, що більші за число -17;
-                        {2}
-                        
-                        4.Одновимірний масив, що містить прості числа з першого масиву
-                        {3}
-                        
-                        5.Сгенерований або заповнений вами масив
-                        {4}
-                        """,
-                        Arrays.toString(array1),
-                        Arrays.toString(array2),
-                        Arrays.toString(array3),
-                        Arrays.toString(array4),
-                        integers.toString()
-                );
-                cout(temp, ApplicationInit.textColor);
-            }
-        }
+    @Override
+    protected void secondOperation() {
+        emails.add("RussianEmail@mail.ru");
+        emails.add("SecondRussianEmail@mail.ru");
+        emails.add("TempEmail@gmail.com");
+        emails.add("PetroPoroshenko@president.ua");
     }
 
-    public Integer[] getFibonacciArray() {
-        ArrayList<Integer> temp = new ArrayList<>();
-        for (int i = integers.size() - 1; i >= 2; i--) {
-            if (integers.get(i) == integers.get(i - 1) + integers.get(i - 2))
-                temp.add(integers.get(i));
+    @Override
+    protected void thirdOperation() {
+        if(emails.isEmpty()) {
+            cout(emptySituation);
+            return;
         }
 
-        return temp.toArray(Integer[]::new);
-    }
+        cout("\nThe emails you or the program entered:\n");
+        emails.forEach(email -> cout(email + "\n", Color.GREY));
 
-    private boolean isPrime(int n) {
-        if (n <= 1) {
-            return false; // 1 и все отрицательные числа не простые
-        }
-        for (int i = 2; i <= Math.sqrt(n); i++) {
-            if (n % i == 0) {
-                return false; // Если делится на i, то это не простое число
-            }
-        }
-        return true;
+        emails = emails.stream().filter(s -> !s.contains(".ru")).toList();
+
+        cout("\nGood emails:\n");
+
+        emails.forEach(email -> cout(email + "\n", Color.GREEN));
     }
 }

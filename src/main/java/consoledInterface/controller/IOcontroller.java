@@ -94,7 +94,7 @@ public class IOcontroller {
 
     private void executeTasks() {
         taskExectuor = new TaskExectuor();
-        taskExectuor.main();
+        taskExectuor.start();
     }
 
 }
