@@ -2,6 +2,7 @@ module UniversityLabs {
     requires javafx.controls;
     requires javafx.fxml;
     requires static lombok;
+    requires reflections;
 
     opens consoledInterface to javafx.fxml;
     exports consoledInterface;

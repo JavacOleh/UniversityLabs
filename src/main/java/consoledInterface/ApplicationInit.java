@@ -118,6 +118,7 @@ public class ApplicationInit extends Application {
 
     public static ArrayList<ExecutorService> registerExecutorServices() {
         var executorServices = new ArrayList<ExecutorService>();
+        executorServices.add(ioController.getTaskExectuor().getExecutorService());
         //executorServices.add(ioController.getInputController().getCin().getExecutorService());
         //executorServices.add(ioController.getTaskExectuor().getExecutorService());
 

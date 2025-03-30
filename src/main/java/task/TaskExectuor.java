@@ -5,7 +5,10 @@ import consoledInterface.ApplicationInit;
 import consoledInterface.util.ConcurrentUtil;
 import lombok.Getter;
 import task.interfaces.Taskable;
-import task.tasks.*;
+import task.tasks.task1.Task1;
+import task.tasks.task2.Task2;
+import task.tasks.task3.Task3;
+import task.tasks.task4.Task4;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,7 +40,6 @@ public class TaskExectuor {
                         2.Task 2
                         3.Task 3
                         4.Task 4
-                        5.Task 5
                         """, ApplicationInit.textColor);
 
                 choice.set(parseUtil.getParsedInt(exitChoice, 1));
@@ -69,7 +71,6 @@ public class TaskExectuor {
             case 2 -> new Task2();
             case 3 -> new Task3();
             case 4 -> new Task4();
-            case 5 -> new Task5();
             default -> null;
         };
 
